@@ -29,7 +29,7 @@ class Extractor:
         failed = 0
         for i, curr_file in enumerate(file_list):
             file_number = int(curr_file[4:12])
-            while not os.path.exists(self.download_dir):
+            while not os.path.exists(self.download_dir + f'\{curr_file}'):
                 time.sleep(3)
             try:
                 with pdfplumber.open(self.download_dir + f'\{curr_file}') as pdf:
