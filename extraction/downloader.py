@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium_stealth import stealth
 import os
+import time
 
 class Downloader:
     
@@ -15,7 +16,7 @@ class Downloader:
         if not os.path.exists(self.download_dir):
             os.makedirs(self.download_dir)
             
-        self.base_url = ['https://www.justice.gov/epstein/files/DataSet%20','/EFTA','.pdf']
+        self.base_url = 'https://www.justice.gov/epstein/files/DataSet%20'
         
         self.driver = self.start_wd()
         self.driver.get('https://www.justice.gov/age-verify?')
@@ -29,13 +30,14 @@ class Downloader:
         """
         service = ChromeService(executable_path=ChromeDriverManager().install())
         options = ChromeOptions()
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--no-sandbox')
         options.add_argument("--headless")
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument('--disable-popup-blocking')
         options.add_argument('--start-maximized')
         options.add_argument('--disable-extensions')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--remote-debugging-pipe')
         
         
         driver = Chrome(service=service, options=options)
@@ -59,7 +61,7 @@ class Downloader:
     def get(self, URL:str):
         return self.driver.get(URL)
     
-    def download_all_dataset(self, dataset:int, file_start:int, file_end:int):
+    def download_all_dataset(self, dataset:int, file_list:list):
         """Download de arquivos em um intervalo de um dataset escolhido
 
         Args:
@@ -67,17 +69,17 @@ class Downloader:
             file_start (int): primeiro arquivo do dataset
             file_end (int): último arquivo do dataset
         """
-        for curr_file in range(file_start, file_end+1):
-            file_number = '00000000'[:-len(str(curr_file))] + str(curr_file)
-            URL = self.base_url[0] + str(dataset) + self.base_url[1] + file_number + self.base_url[2]
+        for curr_file in file_list:
+            time.sleep(1)
+            URL = self.base_url + f'{str(dataset)}/{curr_file}'
                     
             response = self.request(URL)
             if response.status_code == 200:
-                with open(self.download_dir + f'\{curr_file}.pdf', 'wb') as f:
+                with open(self.download_dir + f'\{curr_file}', 'wb') as f:
                     for chunk in response.iter_content(chunk_size=8192):
                         f.write(chunk)
             else:
-                print(f"Failed to download {file_number}. Status code: {response.status_code}")
+                print(f"Failed to download {curr_file}. Status code: {response.status_code}")
                 break
         self.driver.close()
         self.driver.quit()
