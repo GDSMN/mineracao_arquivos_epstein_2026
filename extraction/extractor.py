@@ -29,16 +29,17 @@ class Extractor:
         failed = 0
         for i, curr_file in enumerate(file_list):
             file_number = int(curr_file[4:12])
-            while not os.path.exists(self.download_dir + f'\{curr_file}'):
+            while not os.path.exists(self.download_dir + f'/{curr_file}'):
                 time.sleep(3)
             try:
-                with pdfplumber.open(self.download_dir + f'\{curr_file}') as pdf:
+                with pdfplumber.open(self.download_dir + f'/{curr_file}') as pdf:
                     for page in pdf.pages:
                         page_text = page.extract_text()
                         if re.search(r'EFTA\d{8}' , page_text[-12:]): page_text = page_text[:-12]
+                        page_text = page_text.replace('\"',"\'")
                         text_content[i][0] = curr_file
                         text_content[i][1] += page_text
-                os.remove(self.download_dir + f'\{curr_file}')
+                os.remove(self.download_dir + f'/{curr_file}')
                 failed = 0
             except:
                 print(f'Exceção: arquivo {curr_file}')
@@ -50,4 +51,4 @@ class Extractor:
         
         new = pd.DataFrame(data=text_content, columns=['file','content'])
         dt = pd.concat([dt, new], ignore_index=True)
-        dt.to_csv(path)
+        dt.to_csv(path, sep='|')
