@@ -42,6 +42,8 @@ class Extractor:
                 failed = 0
             except:
                 print(f'Exceção: arquivo {curr_file}')
+                text_content[i][0] = curr_file
+                text_content[i][1] += "failed"
                 failed += 1
                 if failed > 20:
                     break
