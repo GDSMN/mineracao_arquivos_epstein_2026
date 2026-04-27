@@ -23,7 +23,7 @@ class Extractor:
         if not os.path.exists(path):
             dt = pd.DataFrame(columns=['file', 'content'])
         else:
-            dt = pd.read_csv(path)
+            dt = pd.read_csv(path, sep='|')
         
         text_content = [[0,''] for i in range(len(file_list))]
         failed = 0
