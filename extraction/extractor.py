@@ -19,12 +19,6 @@ class Extractor:
             file_start (int): primeiro arquivo do dataset
             file_end (int): último arquivo do dataset
         """
-        path = os.path.join(os.getcwd(), f'..\\dataset{dataset}.csv')
-        if not os.path.exists(path):
-            dt = pd.DataFrame(columns=['file', 'content'])
-        else:
-            dt = pd.read_csv(path, sep='|')
-        
         text_content = [[0,''] for i in range(len(file_list))]
         failed = 0
         for i, curr_file in enumerate(file_list):
@@ -47,8 +41,9 @@ class Extractor:
                 text_content[i][1] += "failed"
                 failed += 1
                 if failed > 20:
+                    print('falha')
                     break
         
-        new = pd.DataFrame(data=text_content, columns=['file','content'])
-        dt = pd.concat([dt, new], ignore_index=True)
+        path = os.path.join(os.getcwd(), f'..\\dataset{dataset}-{file_number}.csv')
+        dt = pd.DataFrame(data=text_content, columns=['file','content'])
         dt.to_csv(path, sep='|')
