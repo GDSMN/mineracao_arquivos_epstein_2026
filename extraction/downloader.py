@@ -22,7 +22,7 @@ class Downloader:
         self.driver.get('https://www.justice.gov/age-verify?')
         self.driver.find_element(By.ID, 'age-button-yes').click()
     
-    def start_wd(self):
+    def start_wd(self) -> Chrome:
         """Configura webdriver
 
         Returns:
