@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import spacy
+import re
 # from spacy_syllables import SpacySyllables
 
 from spellchecker import SpellChecker # pip install pyspellchecker
@@ -47,11 +48,12 @@ class linguisticFeatures:
                 'count_stopwords',
                 'count_misspellings',
                 'avg_pausality',
-                'positivity',
-                'negativity',
+                # 'positivity',
+                # 'negativity',
                 'uncertainty',
                 'nonImmediacy_individualReferences',
-                'nonImmediacy_groupReferences'
+                'nonImmediacy_groupReferences',
+                'preprocess'
                 ]
         functions = [self.count_tokens,
                 self.count_types,
@@ -66,7 +68,8 @@ class linguisticFeatures:
                 # self.calculate_negativity,
                 self.calculate_uncertainty,
                 self.calculate_nonImmediacy_individualReferences,
-                self.calculate_nonImmediacy_groupReferences]
+                self.calculate_nonImmediacy_groupReferences,
+                self.pre_process_text]
         requested = []
         if len(titles) == 0:
             requested = functions
@@ -107,6 +110,8 @@ class linguisticFeatures:
                 nonImmediacy_individualReferences
                 
                 nonImmediacy_groupReferences
+                
+                preprocess
         """
         requested, names = self.__name_functions(args)
         
@@ -123,6 +128,9 @@ class linguisticFeatures:
                 values['count_adjectives'] = np.zeros(len(dataset))
                 values['count_adverbs'] = np.zeros(len(dataset))
                 values['count_pronouns'] = np.zeros(len(dataset))
+                continue
+            if name == 'preprocess': 
+                values[name] = ['' for i in range(len(dataset))]
                 continue
             values[name] = np.zeros(len(dataset))
         
@@ -376,3 +384,15 @@ class linguisticFeatures:
         redundancy_values = function_words_count / num_sentences if num_sentences > 0 else 0
 
         return redundancy_values
+    
+    def pre_process_text(self, doc):
+        # doc = str(doc).lower()
+        # doc = re.sub(r'[^a-z]+', ' ', doc)
+        
+        processed_tokens = []
+
+        for token in doc:
+            if not token.is_stop and not token.is_punct and len(token.text) > 2:
+                processed_tokens.append(token.lemma_)
+
+        return " ".join(processed_tokens)
