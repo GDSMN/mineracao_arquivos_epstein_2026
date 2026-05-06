@@ -26,6 +26,9 @@ class Extractor:
             while not os.path.exists(self.download_dir + f'/{curr_file}'):
                 time.sleep(3)
             try:
+                file_type = curr_file.split('.')[-1]
+                if file_type == 'mp4' or 'mov' or 'avi':
+                    raise RuntimeError('video file')
                 with pdfplumber.open(self.download_dir + f'/{curr_file}') as pdf:
                     for page in pdf.pages:
                         page_text = page.extract_text()
