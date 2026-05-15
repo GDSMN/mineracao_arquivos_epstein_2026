@@ -39,3 +39,24 @@ class Utils:
             temp_dt = pd.read_csv(file, sep='|', index_col=0)
             data = pd.concat([data, temp_dt])
         return data
+    
+    def load_processed_partials(path:str):
+        """Carrega os datasets informados da pasta atual.
+        Args:
+            path: Diretório onde estão os csv dos datasets
+            datasets: Número do datasets para carregar que estão no diretório informado
+        Returns:
+            dataset: Datasets concatenados e indicados por número
+        """
+        file_list = [f for f in Path(getcwd()+path).iterdir() if f.is_file()]
+        # data = pd.DataFrame(columns=['file', 'content'])
+        data = pd.DataFrame()
+        for file in file_list:
+            temp_dt = pd.read_csv(file, sep='|', index_col=0)
+            data = pd.concat([data, temp_dt])
+        data.loc[data['file_type'] == 'pdf', 'content'] = data.loc[data['file_type'] == 'pdf', 'content'].replace({'failed': nan})
+        data = data.replace({"b''": nan})
+        data = data.sort_values(by='preprocessed_text' ,na_position='first')
+        data = data.drop_duplicates(subset='file',keep='last')
+        data = data.sort_values(by='file')
+        return data

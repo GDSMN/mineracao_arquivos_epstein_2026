@@ -392,7 +392,7 @@ class linguisticFeatures:
         processed_tokens = []
 
         for token in doc:
-            if not token.is_stop and not token.is_punct and len(token.text) > 2:
-                processed_tokens.append(token.lemma_)
+            if not token.is_stop and not token.is_punct and not token.like_num and token.is_alpha and len(token.text) > 1:
+                processed_tokens.append(str(token.lemma_).lower())
 
         return " ".join(processed_tokens)
