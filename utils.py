@@ -6,7 +6,7 @@ from numpy import nan
 
 class Utils:
     
-    def load(path:str='/datasets', *datasets:int) -> pd.DataFrame:
+    def load(path:str='/datasets/raw', *datasets:int) -> pd.DataFrame:
         """Carrega os datasets informados da pasta atual.
         Args:
             path: Diretório onde estão os csv dos datasets
@@ -23,7 +23,7 @@ class Utils:
             dataset = pd.concat([dataset, temp_dt])
         return dataset
     
-    def load_from_dir(path:str='/datasets', dataset:int=10) -> pd.DataFrame:
+    def load_from_dir(path:str='/datasets/raw', dataset:int=10) -> pd.DataFrame:
         """Carrega os datasets informados da pasta atual.
         Args:
             path: Diretório onde estão os csv dos datasets
