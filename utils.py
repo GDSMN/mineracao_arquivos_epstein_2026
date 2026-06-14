@@ -40,11 +40,15 @@ class Utils:
             data = pd.concat([data, temp_dt])
         return data
     
-    def load_processed_partials(path:str):
+    def load_processed_partials(path:str, column:str, type:type=str, index_col:int=None, filter_filetype:bool = False):
         """Carrega os datasets informados da pasta atual.
         Args:
             path: Diretório onde estão os csv dos datasets
             datasets: Número do datasets para carregar que estão no diretório informado
+            column: Nome da coluna de interesse
+            type: Tipo da coluna de interesse
+            index_col
+            filter_filetype: Bool. Verdadeiro se existem linhas com formatos diferentes de pdf
         Returns:
             dataset: Datasets concatenados e indicados por número
         """
@@ -52,11 +56,16 @@ class Utils:
         # data = pd.DataFrame(columns=['file', 'content'])
         data = pd.DataFrame()
         for file in file_list:
-            temp_dt = pd.read_csv(file, sep='|', index_col=0)
+            if index_col:
+                temp_dt = pd.read_csv(file, sep='|', index_col=index_col)
+            else:
+                temp_dt = pd.read_csv(file, sep='|')
             data = pd.concat([data, temp_dt])
-        data.loc[data['file_type'] == 'pdf', 'content'] = data.loc[data['file_type'] == 'pdf', 'content'].replace({'failed': nan})
+        if filter_filetype:
+            data.loc[data['file_type'] == 'pdf', 'content'] = data.loc[data['file_type'] == 'pdf', 'content'].replace({'failed': nan})
+        data[column] = data[column].astype(type)
         data = data.replace({"b''": nan})
-        data = data.sort_values(by='preprocessed_text' ,na_position='first')
+        data = data.sort_values(by=column ,na_position='first')
         data = data.drop_duplicates(subset='file',keep='last')
-        data = data.sort_values(by='file')
+        data = data.sort_values(by='file').reset_index(drop=True)
         return data
